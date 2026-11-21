@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Leave a Review | GinllTrust</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --star-active: #f59e0b;
+      --star-inactive: #cbd5e1;
+      --success-bg: #f0fdf4;
+      --success-text: #166534;
+      --error-bg: #fef2f2;
+      --error-text: #991b1b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px 28px;
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06);
+    }
+
+    .header { text-align: center; margin-bottom: 24px; }
+
+    .badge {
+      display: inline-block;
+      background: #eff6ff;
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+    }
+
+    h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+    .subtitle { font-size: 14px; color: var(--muted); line-height: 1.5; }
+
+    .star-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 22px;
+      padding: 16px;
+      background: #f8fafc;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .stars { display: flex; gap: 8px; margin-bottom: 6px; }
+
+    .star-btn {
+      background: none;
+      border: none;
+      font-size: 34px;
+      line-height: 1;
+      cursor: pointer;
+      color: var(--star-inactive);
+      transition: transform 0.12s ease, color 0.12s ease;
+    }
+
+    .star-btn:hover { transform: scale(1.12); }
+    .star-btn.active { color: var(--star-active); }
+    .rating-label { font-size: 13px; font-weight: 600; color: var(--muted); }
+    .form-group { margin-bottom: 16px; }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 11px 14px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    input:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    textarea { resize: vertical; min-height: 110px; }
+
+    .char-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 13px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #ffffff;
+      background: var(--primary);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      margin-top: 6px;
+    }
+
+    .submit-btn:hover:not(:disabled) { background: var(--primary-hover); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .alert {
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .alert.error {
+      background: var(--error-bg);
+      color: var(--error-text);
+      border: 1px solid #fecaca;
+    }
+
+    .success-box { display: none; text-align: center; padding: 20px 10px; }
+
+    .success-icon {
+      width: 52px;
+      height: 52px;
+      background: var(--success-bg);
+      color: var(--success-text);
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      margin-bottom: 14px;
+    }
+
+    .success-box h2 { font-size: 20px; margin-bottom: 8px; }
+    .success-box p { font-size: 14px; color: var(--muted); line-height: 1.5; }
+    .powered-by { text-align: center; margin-top: 22px; font-size: 12px; color: var(--muted); }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div id="errorAlert" class="alert error"></div>
+
+    <div id="formSection">
+      <div class="header">
+        <span class="badge" id="workspaceBadge">Loading workspace...</span>
+        <h1 id="pageTitle">Share your experience</h1>
+        <p class="subtitle">Your feedback helps others know what it's like working with us.</p>
+      </div>
+
+      <form id="reviewForm">
+        <div class="star-group">
+          <div class="stars" id="starContainer">
+            <button type="button" class="star-btn active" data-value="1">★</button>
+            <button type="button" class="star-btn active" data-value="2">★</button>
+            <button type="button" class="star-btn active" data-value="3">★</button>
+            <button type="button" class="star-btn active" data-value="4">★</button>
+            <button type="button" class="star-btn active" data-value="5">★</button>
+          </div>
+          <span class="rating-label" id="ratingText">5.0 — Excellent</span>
+          <input type="hidden" id="ratingInput" value="5" />
+        </div>
+
+        <div class="form-group">
+          <label for="authorName">Your Name *</label>
+          <input type="text" id="authorName" placeholder="e.g. Sarah Kato" required />
+        </div>
+
+        <div class="form-group">
+          <label for="authorEmail">Email Address * (kept private)</label>
+          <input type="email" id="authorEmail" placeholder="sarah@company.com" required />
+        </div>
+
+        <div class="form-group">
+          <label for="authorCompany">Company or Role (optional)</label>
+          <input type="text" id="authorCompany" placeholder="e.g. Founder at Kampala Roast" />
+        </div>
+
+        <div class="form-group">
+          <label for="reviewText">Your Review *</label>
+          <textarea id="reviewText" maxlength="600" placeholder="What did you enjoy most about working with us?" required></textarea>
+          <div class="char-row">
+            <span>Be honest and specific</span>
+            <span id="charCount">0 / 600</span>
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">Submit Review</button>
+      </form>
+    </div>
+
+    <div id="successSection" class="success-box">
+      <div class="success-icon">✓</div>
+      <h2>Thank you for your review!</h2>
+      <p>Your testimonial has been submitted and is currently being verified before going live.</p>
+    </div>
+
+    <div class="powered-by">
+      Verified reviews powered by <strong>GinllTrust</strong>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      query,
+      where,
+      getDocs,
+      addDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAqHzy9QHJ-Xcl5Q0QCVxh96AiuM6iZ2KY",
+      authDomain: "studio-6180730764-3daa0.firebaseapp.com",
+      databaseURL: "https://studio-6180730764-3daa0-default-rtdb.firebaseio.com",
+      projectId: "studio-6180730764-3daa0",
+      storageBucket: "studio-6180730764-3daa0.firebasestorage.app",
+      messagingSenderId: "170058755345",
+      appId: "1:170058755345:web:e67384e203dff49185b0b0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    let resolvedWorkspaceId = null;
+
+    const ratingLabels = {
+      1: "1.0 — Poor",
+      2: "2.0 — Fair",
+      3: "3.0 — Good",
+      4: "4.0 — Very Good",
+      5: "5.0 — Excellent"
+    };
+
+    const starBtns = document.querySelectorAll(".star-btn");
+    const ratingInput = document.getElementById("ratingInput");
+    const ratingText = document.getElementById("ratingText");
+
+    starBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const val = parseInt(btn.getAttribute("data-value"), 10);
+        ratingInput.value = val;
+        ratingText.textContent = ratingLabels[val];
+        starBtns.forEach(s => {
+          const sVal = parseInt(s.getAttribute("data-value"), 10);
+          s.classList.toggle("active", sVal <= val);
+        });
+      });
+    });
+
+    const reviewTextEl = document.getElementById("reviewText");
+    const charCountEl = document.getElementById("charCount");
+    reviewTextEl.addEventListener("input", () => {
+      charCountEl.textContent = `${reviewTextEl.value.length} / 600`;
+    });
+
+    function getSlugFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("slug")) return params.get("slug").trim();
+
+      const parts = window.location.pathname.split("/").filter(Boolean);
+      const rIndex = parts.indexOf("r");
+      if (rIndex !== -1 && parts[rIndex + 1]) {
+        return parts[rIndex + 1].trim();
+      }
+      return null;
+    }
+
+    function showError(msg) {
+      const alertBox = document.getElementById("errorAlert");
+      alertBox.textContent = msg;
+      alertBox.style.display = "block";
+    }
+
+    async function loadWorkspace() {
+      const params = new URLSearchParams(window.location.search);
+      const directWorkspaceId = params.get("workspace");
+      const slug = getSlugFromUrl();
+      const badgeEl = document.getElementById("workspaceBadge");
+      const titleEl = document.getElementById("pageTitle");
+
+      if (directWorkspaceId) {
+        resolvedWorkspaceId = directWorkspaceId;
+        badgeEl.textContent = `Workspace: ${directWorkspaceId}`;
+        return;
+      }
+
+      if (!slug) {
+        badgeEl.textContent = "Missing review link";
+        showError("No workspace slug found in URL. Open via /review.html?slug=your-slug or ?workspace=YOUR_ID.");
+        document.getElementById("submitBtn").disabled = true;
+        return;
+      }
+
+      try {
+        const q = query(collection(db, "workspaces"), where("slug", "==", slug));
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+          badgeEl.textContent = `@${slug}`;
+          showError(`Workspace "${slug}" was not found. Check the link and try again.`);
+          document.getElementById("submitBtn").disabled = true;
+          return;
+        }
+
+        const wsDoc = snapshot.docs[0];
+        const wsData = wsDoc.data();
+        resolvedWorkspaceId = wsDoc.id;
+
+        badgeEl.textContent = `@${slug}`;
+        if (wsData.name) {
+          titleEl.textContent = `Review ${wsData.name}`;
+        }
+      } catch (err) {
+        console.error("Error loading workspace:", err);
+        showError("Could not connect to workspace. Make sure Firestore rules allow reading workspaces.");
+        document.getElementById("submitBtn").disabled = true;
+      }
+    }
+
+    loadWorkspace();
+
+    document.getElementById("reviewForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!resolvedWorkspaceId) return;
+
+      const submitBtn = document.getElementById("submitBtn");
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Submitting...";
+
+      const authorName = document.getElementById("authorName").value.trim();
+      const authorEmail = document.getElementById("authorEmail").value.trim();
+      const authorCompany = document.getElementById("authorCompany").value.trim();
+      const rating = parseInt(ratingInput.value, 10);
+      const text = reviewTextEl.value.trim();
+
+      try {
+        await addDoc(collection(db, `workspaces/${resolvedWorkspaceId}/testimonials`), {
+          authorName,
+          authorEmail,
+          authorCompany,
+          rating,
+          text,
+          status: "PENDING",
+          createdAt: serverTimestamp()
+        });
+
+        document.getElementById("formSection").style.display = "none";
+        document.getElementById("errorAlert").style.display = "none";
+        document.getElementById("successSection").style.display = "block";
+      } catch (err) {
+        console.error("Submission failed:", err);
+        showError("Failed to submit review. Please check your connection or Firestore rules.");
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Submit Review";
+      }
+    });
+  </script>
+</body>
+</html>
