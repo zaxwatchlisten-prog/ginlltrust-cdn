@@ -26,7 +26,7 @@
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;font-family:system-ui,-apple-system,sans-serif;">
           ${items.map((t) => `
             <div style="border:1px solid #e2e8f0;border-radius:12px;padding:16px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
-              <div style="color:#f59e0b;font-size:16px;margin-bottom:8px;">${"★".repeat(Math.round(t.rating || 5))}</div>
+              <div style="color:#f59e0b;font-size:16px;margin-bottom:8px;">${"\u2605".repeat(Math.round(t.rating || 5))}</div>
               <p style="margin:0 0 12px;color:#1e293b;font-size:14px;line-height:1.5;">"${t.text}"</p>
               <div style="font-size:13px;font-weight:600;color:#0f172a;">${t.authorName}</div>
               ${t.authorCompany ? `<div style="font-size:12px;color:#64748b;">${t.authorCompany}</div>` : ""}
